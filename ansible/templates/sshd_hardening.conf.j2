@@ -1,0 +1,15 @@
+# Managed by Ansible (harden-linux-host.yml) - local edits will be overwritten.
+Port {{ ssh_port }}
+PermitRootLogin no
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes
+MaxAuthTries {{ ssh_max_auth_tries }}
+LoginGraceTime 30
+X11Forwarding no
+AllowTcpForwarding no
+AllowAgentForwarding no
+ClientAliveInterval 300
+ClientAliveCountMax 2
+AllowUsers {{ ssh_allowed_users | join(' ') }}
+LogLevel VERBOSE

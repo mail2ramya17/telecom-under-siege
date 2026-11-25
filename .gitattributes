@@ -1,0 +1,6 @@
+# Show the Ansible playbooks (YAML) in GitHub's language bar.
+ansible/**/*.yml linguist-detectable=true
+ansible/**/*.j2 linguist-language=Jinja
+# Media files are binary assets, not code.
+media/** binary linguist-vendored
+docs/img/** linguist-documentation

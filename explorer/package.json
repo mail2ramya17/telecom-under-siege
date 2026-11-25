@@ -1,0 +1,15 @@
+{
+  "name": "telecom-attack-path-explorer",
+  "version": "1.0.0",
+  "description": "Maps telecom attack paths to defensive controls and reports coverage gaps",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p .",
+    "report": "node dist/cli.js",
+    "gate": "node dist/cli.js --fail-under 60"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

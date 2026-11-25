@@ -1,0 +1,8 @@
+build/
+explorer/dist/
+explorer/node_modules/
+detector/build/
+__pycache__/
+*.wav
+ansible/inventory.ini
+.DS_Store

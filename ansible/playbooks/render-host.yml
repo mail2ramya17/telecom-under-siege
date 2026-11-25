@@ -1,0 +1,65 @@
+---
+# Provision a machine that can rebuild the video and run every tool in this repo.
+#   ansible-playbook playbooks/render-host.yml -l render_hosts
+#   ansible-playbook playbooks/render-host.yml -l localhost
+- name: Provision render and tooling host
+  hosts: render_hosts:local
+  vars:
+    repo_url: https://github.com/mail2ramya17/telecom-under-siege.git
+    repo_dest: /opt/telecom-under-siege
+    python_packages: [numpy, scipy, pillow]
+  tasks:
+    - name: Install system packages
+      ansible.builtin.apt:
+        name:
+          - ffmpeg
+          - python3
+          - python3-pip
+          - python3-venv
+          - fonts-inter
+          - fonts-dejavu-core
+          - nodejs
+          - npm
+          - openjdk-21-jdk-headless
+          - git
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create Python virtualenv with rendering libraries
+      ansible.builtin.pip:
+        name: "{{ python_packages }}"
+        virtualenv: /opt/telecom-venv
+        virtualenv_command: python3 -m venv
+
+    - name: Install TypeScript compiler
+      community.general.npm:
+        name: typescript
+        global: true
+        state: present
+
+    - name: Clone the repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_dest }}"
+        version: main
+        update: true
+      become: false
+
+    - name: Build the TypeScript attack-path explorer
+      ansible.builtin.command: tsc -p .
+      args:
+        chdir: "{{ repo_dest }}/explorer"
+      changed_when: true
+
+    - name: Verify toolchain
+      ansible.builtin.command: "{{ repo_dest }}/scripts/preflight.sh"
+      environment:
+        PATH: "/opt/telecom-venv/bin:{{ ansible_env.PATH }}"
+      register: preflight
+      changed_when: false
+
+    - name: Show preflight result
+      ansible.builtin.debug:
+        var: preflight.stdout_lines

@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy scipy pillow ruff
+      - run: python -m py_compile video/*.py
+      - run: ruff check video --select E9,F63,F7,F82
+
+  typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: explorer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+      - run: npm run build
+      - name: Coverage gate - every attack path >= 60% covered
+        run: npm run gate
+
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Detector must flag the synthetic breach (exit 2)
+        run: |
+          set +e
+          detector/build.sh
+          rc=$?
+          test "$rc" -eq 2
+
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck -S warning scripts/*.sh detector/build.sh
+
+  ansible:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install ansible-core ansible-lint
+      - run: ansible-galaxy collection install -r ansible/requirements.yml
+      - run: ansible-playbook --syntax-check -i ansible/inventory.example.ini ansible/playbooks/*.yml
+      - run: ansible-lint ansible/playbooks
