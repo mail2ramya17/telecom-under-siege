@@ -51,7 +51,7 @@
 
     - name: Deploy hardened sshd configuration
       ansible.builtin.template:
-        src: ../templates/sshd_hardening.conf.j2
+        src: sshd_hardening.conf.j2
         dest: /etc/ssh/sshd_config.d/10-hardening.conf
         owner: root
         group: root
@@ -119,7 +119,7 @@
   post_tasks:
     - name: Copy exposure audit script
       ansible.builtin.copy:
-        src: ../../scripts/host-exposure-audit.sh
+        src: "{{ playbook_dir }}/../../scripts/host-exposure-audit.sh"
         dest: /usr/local/sbin/host-exposure-audit
         mode: "0750"
 

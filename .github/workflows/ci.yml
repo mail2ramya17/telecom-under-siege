@@ -12,8 +12,8 @@ jobs:
   python:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install numpy scipy pillow ruff
@@ -26,8 +26,8 @@ jobs:
       run:
         working-directory: explorer
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
       - run: npm install
@@ -38,8 +38,8 @@ jobs:
   java:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -53,13 +53,13 @@ jobs:
   shell:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: shellcheck -S warning scripts/*.sh detector/build.sh
 
   ansible:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: pip install ansible-core ansible-lint
       - run: ansible-galaxy collection install -r ansible/requirements.yml
       - run: ansible-playbook --syntax-check -i ansible/inventory.example.ini ansible/playbooks/*.yml
